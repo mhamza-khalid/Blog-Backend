@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Post" ADD COLUMN     "readTime" INTEGER NOT NULL DEFAULT 0;

@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id             Int                   @id @default(autoincrement())
+  username            String                @unique
+  email               String                @unique
+  password            String
+  is_author           Boolean               @default(false)
+  comments            Comment[]
+  posts               Post[]
+  user_liked_comments user_liked_comments[]
+  user_liked_posts    user_liked_posts[]
+}
+
+model Post {
+  post_id          Int                @id @default(autoincrement())
+  title            String
+  body             String
+  likes            Int                @default(0)
+  created_at       DateTime           @default(now())
+  userId           Int
+  imageURL         String             @default("")
+  isPublished      Boolean            @default(false)
+  readTime         Int                @default(0)
+  comments         Comment[]
+  User             User               @relation(fields: [userId], references: [user_id])
+  user_liked_posts user_liked_posts[]
+}
+
+model Comment {
+  comment_id          Int                   @id @default(autoincrement())
+  body                String
+  created_at          DateTime              @default(now())
+  likes               Int                   @default(0)
+  userId              Int
+  postId              Int
+  Post                Post                  @relation(fields: [postId], references: [post_id])
+  User                User                  @relation(fields: [userId], references: [user_id])
+  user_liked_comments user_liked_comments[]
+}
+
+model user_liked_posts {
+  userId Int
+  postId Int
+  Post   Post @relation(fields: [postId], references: [post_id])
+  User   User @relation(fields: [userId], references: [user_id])
+
+  @@id([userId, postId])
+}
+
+model user_liked_comments {
+  userId    Int
+  commentId Int
+  Comment   Comment @relation(fields: [commentId], references: [comment_id])
+  User      User    @relation(fields: [userId], references: [user_id])
+
+  @@id([userId, commentId])
+}
